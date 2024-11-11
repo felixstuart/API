@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 
 // video to load jar
@@ -91,8 +92,15 @@ public class ReadJson {
             }
             String height = (String) jsonObject.get("height");
             String mass = (String) jsonObject.get("mass");
+            String eyeColor = (String) jsonObject.get("eye_color");
+            String birthYear = (String) jsonObject.get("birth_year");
+            List<String> starShips = (List<String>) jsonObject.get("starships");
+            
             System.out.println(mass);
             System.out.println(name);
+            System.out.println(eyeColor);
+            System.out.println(birthYear);
+            System.out.println(starShips);
         } catch (Exception e) {
             e.printStackTrace();
         }
