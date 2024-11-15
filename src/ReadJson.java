@@ -10,6 +10,7 @@ import java.util.List;
 // video to load jar
 //https://www.youtube.com/watch?v=QAJ09o3Xl_0
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -41,10 +42,10 @@ public class ReadJson {
 
     public void pull() throws ParseException {
         String output = "abc";
-        String totlaJson = "";
+        String totaljson = "";
         try {
 
-            URL url = new URL("https://swapi.dev/api/people/4/");
+            URL url = new URL("https://pokeapi.co/api/v2/pokemon/ditto");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -62,7 +63,7 @@ public class ReadJson {
             System.out.println("Output from Server .... \n");
             while ((output = br.readLine()) != null) {
                 System.out.println(output);
-                totlaJson += output;
+                totaljson += output;
             }
 
             conn.disconnect();
@@ -76,31 +77,20 @@ public class ReadJson {
 
         JSONParser parser = new JSONParser();
         //System.out.println(str);
-        org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) parser.parse(totlaJson);
+        org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) parser.parse(totaljson);
         System.out.println(jsonObject);
 
         try {
 
-            String name = (String) jsonObject.get("name");
 
-            org.json.simple.JSONArray msg = (org.json.simple.JSONArray) jsonObject.get("films");
-            int n = msg.size(); //(msg).length();
-            for (int i = 0; i < n; ++i) {
-                String test = (String) msg.get(i);
-                System.out.println(test);
-                // System.out.println(person.getInt("key"));
+            System.out.println(jsonObject);
+            System.out.println(jsonObject.get("name").toString());
+            JSONArray abilities = (JSONArray) jsonObject.get("abilities");
+            System.out.print("Abilities:");
+            for (Object ability : abilities) {
+                System.out.print(", "+((JSONObject)((JSONObject) ability).get("ability")).get("name"));
             }
-            String height = (String) jsonObject.get("height");
-            String mass = (String) jsonObject.get("mass");
-            String eyeColor = (String) jsonObject.get("eye_color");
-            String birthYear = (String) jsonObject.get("birth_year");
-            List<String> starShips = (List<String>) jsonObject.get("starships");
-            
-            System.out.println(mass);
-            System.out.println(name);
-            System.out.println(eyeColor);
-            System.out.println(birthYear);
-            System.out.println(starShips);
+            System.out.println(jsonObject.get("order"));
         } catch (Exception e) {
             e.printStackTrace();
         }
