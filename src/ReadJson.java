@@ -4,22 +4,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.awt.*;
-import java.util.Objects;
 import javax.swing.*;
+import javax.swing.border.Border;
 
 
 // video to load jar
 //https://www.youtube.com/watch?v=QAJ09o3Xl_0
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,7 +22,7 @@ public class ReadJson {
     final private int HEIGHT = 800;
     final private int WIDTH = 700;
 
-    public static void main(String args[]) throws ParseException {
+    public static void main(String args[]) throws ParseException, java.text.ParseException {
         // In java JSONObject is used to create JSON object
         // which is a subclass of java.util.HashMap.
 
@@ -44,28 +37,63 @@ public class ReadJson {
 
     }
 
-    public ReadJson() {
-        makeUI();
+    public ReadJson() throws java.text.ParseException, ParseException {
+        Pokemon pokemon = null;
         try {
-            pull();
+            pokemon = pull("ditto");
         } catch (Exception e) {
-            System.out.println(e);
+
         }
+        makeUI(pokemon);
     }
 
     private void makeUI(Pokemon pokemon) {
         JFrame pokedex = new JFrame();
         pokedex.setSize(WIDTH, HEIGHT);
-        pokedex.setLayout(new GridLayout(2,1));
+        pokedex.setLayout(new GridBagLayout());
 
-        JLabel nameTitle = new JLabel("Name");
-        JLabel nameText = new JLabel("Ditto");
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
 
-        pokedex.add(newTitleAndContentVertical("Name", "Ditto"));
+        JLabel sprite = new JLabel(pokemon.sprite);
+        sprite.setSize(1000, 1000);
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        pokedex.add(sprite, c);
 
-        JLabel ablilitiesTitle = new JLabel("Abilities");
-        ablilitiesTitle.setFont(new Font("Tahoma", Font.BOLD, 14));
-        pokedex.add(ablilitiesTitle);
+        JPanel name = new JPanel();
+
+        JLabel nameTitleText = new JLabel("Name");
+        nameTitleText.setFont(new Font("Tahoma", Font.BOLD, 14));
+        JLabel contentText = new JLabel(capFirstLetter(pokemon.name));
+
+        name.setLayout(new GridLayout(2, 1));
+        name.add(nameTitleText);
+        name.add(contentText);
+        c.gridx = 1;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        pokedex.add(name, c);
+
+        JPanel abilities = new JPanel();
+        abilities.setLayout(new GridLayout(3, 1));
+        JLabel abilitiesTitleText = new JLabel("Abilities");
+        abilitiesTitleText.setFont(new Font("Tahoma", Font.BOLD, 14));
+        abilities.add(abilitiesTitleText);
+
+        for (String abilityText : pokemon.abilities) {
+            JLabel abilityTextJLabel = new JLabel(capFirstLetter(abilityText));
+            abilities.add(abilityTextJLabel);
+        }
+        c.gridx = 2;
+        c.gridy = 1;
+        c.weightx = 0.5;
+        pokedex.add(abilities, c);
+
+
+
+
         pokedex.setVisible(true);
 
     }
@@ -77,19 +105,19 @@ public class ReadJson {
         titleText.setFont(new Font("Tahoma", Font.BOLD, 14));
         JLabel contentText = new JLabel(content);
 
-        panel.setLayout(new GridLayout(2,1));
+        panel.setLayout(new GridLayout(2, 1));
         panel.add(titleText);
         panel.add(contentText);
 
         return panel;
     }
 
-    public void pull() throws ParseException {
+    public Pokemon pull(String name) throws ParseException {
         String output = "abc";
         String totaljson = "";
         try {
 
-            URL url = new URL("https://pokeapi.co/api/v2/pokemon/ditto");
+            URL url = new URL("https://pokeapi.co/api/v2/pokemon/" + name);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -125,22 +153,17 @@ public class ReadJson {
         System.out.println(jsonObject);
 
         try {
-
-
-            System.out.println(jsonObject);
-            System.out.println(jsonObject.get("name").toString());
-            JSONArray abilities = (JSONArray) jsonObject.get("abilities");
-            System.out.print("Abilities:");
-            for (Object ability : abilities) {
-                System.out.print(", " + ((JSONObject) ((JSONObject) ability).get("ability")).get("name"));
-            }
-            System.out.println(jsonObject.get("order"));
+            return new Pokemon(jsonObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
+        return null;
     }
+
+    private String capFirstLetter(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
 }
 
 
