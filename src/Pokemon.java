@@ -21,7 +21,7 @@ public class Pokemon {
     public List<String> abilities;
     public String imageURL;
     public String pokeURL;
-    public ImageIcon sprite;
+    public int index;
 
     public Pokemon(JSONObject jsonObject) {
         pokeURL = null;
@@ -34,15 +34,8 @@ public class Pokemon {
         }).toList();
 
         imageURL = (String) ((JSONObject) jsonObject.get("sprites")).get("front_default");
-//        partially adapted from https://chatgpt.com/c/673bd6dd-8eb4-8001-a9c3-7f704b44d03c
-        sprite = null;
-        try {
-            URL url = URI.create("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png").toURL();
-            BufferedImage bufferedImage = ImageIO.read(url);
-            sprite = new ImageIcon(bufferedImage.getScaledInstance(300,300, BufferedImage.SCALE_SMOOTH));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        index = ((Long) jsonObject.get("id")).intValue();
     }
 
     public Pokemon(URL pokeURL) throws ParseException, org.json.simple.parser.ParseException {
